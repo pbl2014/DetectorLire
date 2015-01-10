@@ -13,26 +13,31 @@ import net.semanticmetadata.lire.ImageSearchHits;
 import net.semanticmetadata.lire.ImageSearcher;
 import net.semanticmetadata.lire.ImageSearcherFactory;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.FSDirectory;
 
 public class LireCreateIndex {
 
 	// 分析対象フォルダ
-	private final static String TARGET_DIR = "/Users/kakuhrf/Documents/photos/favor";
+	private final static String TARGET_DIR = "/Users/kakuhrf/Documents/lire/syashin";
 
 	// 一時中間データ保存フォルダ
 	private final static String INDEX_PATH = "/Users/kakuhrf/Documents/lire/index";
 	
 	// 画像違い度（0になたら、完全に類似）
-	private final static int DIFF_LEVEL = 30;
+	private final static int DIFF_LEVEL = 20;
 		
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		
         // 処理開始時間を取得します。
         long startTime = System.currentTimeMillis();
         // グループ計数
 		int count = 0;
+		// 分析対象ファイル数
+		int indexCount = 0;
+		// キャッシュ存在するかどうか確認
+		boolean existsCacheFlg = false;
 		
 	    IndexReader reader = null;
 	    ImageSearcher searcher = null;
@@ -42,10 +47,14 @@ public class LireCreateIndex {
 		Map<String, File> fileMap = new HashMap<String, File>();
 		
 		// 分析対象フォルダについて分析中間データ作成
-		int indexCount = DetectorUtil.imageIndexing(INDEX_PATH, TARGET_DIR, true);
+		existsCacheFlg = DirectoryReader.indexExists(FSDirectory.open(new File(INDEX_PATH)));
+		if (!existsCacheFlg) {
+			indexCount = DetectorUtil.imageIndexing(INDEX_PATH, TARGET_DIR, true);
+		}
+		//System.out.println(useCacheFlg);
 		//System.out.println(indexCount);
 		// 重複抽出準備
-		if (indexCount > 0) {
+		if (indexCount > 0 || existsCacheFlg) {
 			File[] fileLists = new java.io.File(TARGET_DIR).listFiles();
 			for (File f : fileLists) {
 				if (f.getName().toLowerCase().endsWith(".jpg") || f.getName().toLowerCase().endsWith(".JPG")) {
