@@ -30,7 +30,7 @@ public class LireCreateIndex {
 		
 	public static void main(String[] args) throws IOException {
 		
-        // 処理開始時間を取得します。
+        // 処理開始時間を取得します
         long startTime = System.currentTimeMillis();
         // グループ計数
 		int count = 0;
