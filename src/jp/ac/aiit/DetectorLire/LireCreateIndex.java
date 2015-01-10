@@ -26,11 +26,11 @@ public class LireCreateIndex {
 	private final static String INDEX_PATH = "/Users/kakuhrf/Documents/lire/index";
 	
 	// 画像違い度（0になたら、完全に類似）
-	private final static int DIFF_LEVEL = 20;
+	private final static int DIFF_LEVEL = 0;
 		
 	public static void main(String[] args) throws IOException {
 		
-        // 処理開始時間を取得します。
+        // 処理開始時間を取得します
         long startTime = System.currentTimeMillis();
         // グループ計数
 		int count = 0;
@@ -75,7 +75,7 @@ public class LireCreateIndex {
 					System.out.println("重複画像グループ" + count);
 					for (int i = 0; i < hits.length(); i++) {
 						// 類似度より抽出する
-						if (hits.score(i) < DIFF_LEVEL) {
+						if (hits.score(i) <= DIFF_LEVEL) {
 							System.out
 							.println(hits.score(i)
 									+ ": "
