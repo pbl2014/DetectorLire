@@ -23,7 +23,7 @@ public class LireCreateIndex {
 	// 一時中間データ保存フォルダ
 	private final static String INDEX_PATH = "/Users/kakuhrf/Documents/lire/index";
 	
-	// 画像違い度（0になたら、完全に類似）
+	// 画像違い度 （0になたら、完全に類似）
 	private final static int DIFF_LEVEL = 30;
 		
 	public static void main(String[] args) {
