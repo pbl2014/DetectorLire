@@ -73,7 +73,7 @@ public class DetectorUtil {
             try {
                 java.util.ArrayList<java.lang.String> images = getAllImages(new java.io.File(targetDir), true);
                 IndexWriter iw = LuceneUtils.createIndexWriter(path, true);
-                DocumentBuilder builder = DocumentBuilderFactory.getFullDocumentBuilder();
+                DocumentBuilder builder = DocumentBuilderFactory.getCEDDDocumentBuilder();
                 for (String identifier : images) {
                     Document doc = builder.createDocument(new FileInputStream(identifier), identifier);
                     iw.addDocument(doc);
