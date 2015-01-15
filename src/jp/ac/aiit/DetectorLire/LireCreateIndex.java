@@ -65,7 +65,7 @@ public class LireCreateIndex {
 					System.out.println("重複画像グループ" + count);
 					for (int i = 0; i < hits.length(); i++) {
 						// 類似度より抽出する
-						if (hits.score(i) < DIFF_LEVEL) {
+						if (hits.score(i) <= DIFF_LEVEL) {
 							System.out
 							.println(hits.score(i)
 									+ ": "
