@@ -39,6 +39,7 @@ public class LireCreateIndex {
 		ImageSearchHits hits = null;
 		List<String> fileNameList = new ArrayList<String>();
 		Map<String, File> fileMap = new HashMap<String, File>();
+		Map<Integer, Map<String, Float>> resultMap = new HashMap<Integer, Map<String, Float>>();
 		
 		// 分析対象フォルダについて分析中間データ作成
 		int indexCount = DetectorUtil.imageIndexing(INDEX_PATH, TARGET_DIR, true);
@@ -55,26 +56,24 @@ public class LireCreateIndex {
 			
 		    try {
 				reader = IndexReader.open(FSDirectory.open(new File(INDEX_PATH)));
-				searcher = ImageSearcherFactory.createCEDDImageSearcher(50);
+				searcher = ImageSearcherFactory.createCEDDImageSearcher(1000);
 				
 				while(fileNameList.size() > 0) {
 					File obj = (File)fileMap.get(fileNameList.get(0));
 					biImg = DetectorUtil.loadImage(obj);	
 					hits = searcher.search(biImg, reader);
 					// 似ている画像をコンソールに出力する
-					System.out.println("重複画像グループ" + count);
+					Map<String, Float> simiGroup = new HashMap<String, Float>();
 					for (int i = 0; i < hits.length(); i++) {
 						// 類似度より抽出する
 						if (hits.score(i) <= DIFF_LEVEL) {
-							System.out
-							.println(hits.score(i)
-									+ ": "
-									+ hits.doc(i).getField(DocumentBuilder.FIELD_NAME_IDENTIFIER)
-											.stringValue());
+							simiGroup.put(hits.doc(i).getField(DocumentBuilder.FIELD_NAME_IDENTIFIER).stringValue(), hits.score(i));
 							fileNameList.remove(DetectorUtil.getSuffix(hits.doc(i).getField(DocumentBuilder.FIELD_NAME_IDENTIFIER).stringValue()));
-							
+						} else {
+							break;
 						}
 					}
+					resultMap.put(count, simiGroup);
 					count++;	
 				}
 			} catch (IOException e) {
@@ -86,7 +85,19 @@ public class LireCreateIndex {
         // 処理終了時間を取得します
         long endTime = System.currentTimeMillis();
         
-        // 処理終了時間から処理開始時間を差し引いてミリ秒で処理時間を表示します
+        // 結果出力
+        for (Entry<Integer, Map<String, Float>> grouprs : resultMap.entrySet()) {
+        	int groupId = grouprs.getKey();
+        	HashMap<String, Float> groupLs = (HashMap<String, Float>) grouprs.getValue();
+        	System.out.println("重複画像グループ" + groupId + "--> " + groupLs.size() + "枚");
+        	for (Entry<String, Float> nodes : groupLs.entrySet()) {
+        		String fileNm = nodes.getKey();
+        		Float similerLevel = nodes.getValue();
+        		System.out.println(similerLevel + ": " + fileNm);
+        	}
+        }
+        
+        // 処理終了時間から処理開始時間を差し引いてミリ秒で処理時間を表示します（出力時間が含まれない）
         System.out.println("処理時間：" + (endTime - startTime)  + "ms");
 	}
 
